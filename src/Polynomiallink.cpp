@@ -40,6 +40,7 @@ private:
 //清空多項式中所有項目的私有方法。它會遍歷鏈表，刪除所有 Term 對象，然後重設 head 節點的鏈接，使其指向自身。
 };
 
+//初始化 Polynomial 對象的成員變量。在這裡主要是用來設置多項式的鏈表頭部節點。
 Polynomial::Polynomial() 
 {
     head = new Term;
@@ -48,6 +49,7 @@ Polynomial::Polynomial()
     //形成一個循環鏈表。這樣設置可以使得當鏈表中沒有其他節點時，head->link 仍然指向自己，簡化了邊界條件處理。
 }
 
+//複製一個現有的 Polynomial 對象 poly 的數據到新創建的 Polynomial 對象中。
 Polynomial::Polynomial(const Polynomial& poly) 
 {
     head = new Term;
