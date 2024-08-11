@@ -284,6 +284,9 @@ int main() {
     
     p3 = p1 + p2;
     cout << "加法結果: " << p3 << endl;
+
+    p3 = p1 - p2;
+    cout << "減法結果: " << p3 << endl;
     
     p3 = p1 * p2;
     cout << "乘法結果: " << p3 << endl;
