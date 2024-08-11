@@ -1,26 +1,25 @@
 #include <iostream>
 #include <cmath>
 using namespace std;
+class Polynomial;////定義類別 Polynomial
 
-class Polynomial;
-
-class Term 
+class Term //定義類別 Term
 {
-    friend class Polynomial;
-    friend ostream& operator<<(ostream&, const Polynomial&);
-    friend istream& operator>>(istream&, Polynomial&);
-private:
-    float coef;
-    int exp;
+    friend class Polynomial;//Polynomial可存取Term的私有成員
+    friend ostream& operator<<(ostream&, const Polynomial&);// << 可存取 Term的私有成員
+    friend istream& operator>>(istream&, Polynomial&);// >> 可存取Term的私有成員
+private://的私有成員
+    float coef;//多項式係數
+    int exp;//多項式指數
     Term* link;//指向下一個 Term 對象的指針，這是用於鏈表結構的一部分
 };
 
-class Polynomial 
+class Polynomial //定義類別 Polynomial
 {
-public:
-    Polynomial();
-    Polynomial(const Polynomial& poly);
-    ~Polynomial();
+public://公有成員
+    Polynomial();//建構函數，用於初始化資料
+    Polynomial(const Polynomial& poly);//複製現有Polynomial物件創建新物件
+    ~Polynomial();//解構函數 
 
     const Polynomial& operator=(const Polynomial& poly);//首先會清空當前對象中的所有項目，然後複製給定對象 (poly) 的所有項目到當前對象中，並返回當前對象 (*this) 的參考。
     Polynomial operator+(const Polynomial& b) const;//加法
