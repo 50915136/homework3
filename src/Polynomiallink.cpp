@@ -1,5 +1,6 @@
 #include <iostream>
-#include <cmath> 
+#include <cmath>
+#include <chrono> // 用於效能量測
 using namespace std;
 
 class Polynomial;
@@ -11,37 +12,35 @@ class Term {
 private:
     float coef;
     int exp;
-    Term* link; // 指向下一個節點
+    Term* link;
 };
 
 class Polynomial {
 public:
-    Polynomial(); // 建構函數
-    Polynomial(const Polynomial& poly); // 複製建構函數
-    ~Polynomial(); // 解構函數
-    
-    const Polynomial& operator=(const Polynomial& poly); // 賦值運算符
-    Polynomial operator+(const Polynomial& b) const; // 加法運算符
-    Polynomial operator-(const Polynomial& b) const; // 減法運算符
-    Polynomial operator*(const Polynomial& b) const; // 乘法運算符
-    float Evaluate(float x) const; // 計算多項式在某個值的結果
-    
+    Polynomial();
+    Polynomial(const Polynomial& poly);
+    ~Polynomial();
+
+    const Polynomial& operator=(const Polynomial& poly);
+    Polynomial operator+(const Polynomial& b) const;
+    Polynomial operator-(const Polynomial& b) const;
+    Polynomial operator*(const Polynomial& b) const;
+    float Evaluate(float x) const;
+
     friend ostream& operator<<(ostream& os, const Polynomial& poly);
     friend istream& operator>>(istream& is, Polynomial& poly);
 
 private:
-    Term* head; // 指向環狀鏈結串列的頭節點
-    void insertTerm(float coef, int exp); // 插入新項目
-    void clear(); // 清空多項式的所有項目
+    Term* head;
+    void insertTerm(float coef, int exp);
+    void clear();
 };
 
-// 無參建構函數
 Polynomial::Polynomial() {
-    head = new Term; // 建立頭節點
-    head->link = head; // 初始化環狀鏈結串列
+    head = new Term;
+    head->link = head;
 }
 
-// 複製建構函數
 Polynomial::Polynomial(const Polynomial& poly) {
     head = new Term;
     head->link = head;
@@ -52,13 +51,11 @@ Polynomial::Polynomial(const Polynomial& poly) {
     }
 }
 
-// 解構函數
 Polynomial::~Polynomial() {
     clear();
     delete head;
 }
 
-// 清空多項式的所有項目
 void Polynomial::clear() {
     Term* current = head->link;
     while (current != head) {
@@ -69,9 +66,8 @@ void Polynomial::clear() {
     head->link = head;
 }
 
-// 插入新項目
 void Polynomial::insertTerm(float coef, int exp) {
-    if (coef == 0) return; // 係數為0不插入
+    if (coef == 0) return;
     Term* prev = head;
     Term* current = head->link;
     while (current != head && current->exp > exp) {
@@ -79,8 +75,8 @@ void Polynomial::insertTerm(float coef, int exp) {
         current = current->link;
     }
     if (current != head && current->exp == exp) {
-        current->coef += coef; // 指數相同則係數相加
-        if (current->coef == 0) { // 如果係數變為0，刪除該項
+        current->coef += coef;
+        if (current->coef == 0) {
             prev->link = current->link;
             delete current;
         }
@@ -93,7 +89,6 @@ void Polynomial::insertTerm(float coef, int exp) {
     }
 }
 
-// 賦值運算符
 const Polynomial& Polynomial::operator=(const Polynomial& poly) {
     if (this != &poly) {
         clear();
@@ -106,7 +101,6 @@ const Polynomial& Polynomial::operator=(const Polynomial& poly) {
     return *this;
 }
 
-// 加法運算符
 Polynomial Polynomial::operator+(const Polynomial& b) const {
     Polynomial result;
     Term* aTerm = head->link;
@@ -135,7 +129,6 @@ Polynomial Polynomial::operator+(const Polynomial& b) const {
     return result;
 }
 
-// 減法運算符
 Polynomial Polynomial::operator-(const Polynomial& b) const {
     Polynomial result;
     Term* aTerm = head->link;
@@ -164,7 +157,6 @@ Polynomial Polynomial::operator-(const Polynomial& b) const {
     return result;
 }
 
-// 乘法運算符
 Polynomial Polynomial::operator*(const Polynomial& b) const {
     Polynomial result;
     for (Term* aTerm = head->link; aTerm != head; aTerm = aTerm->link) {
@@ -175,7 +167,6 @@ Polynomial Polynomial::operator*(const Polynomial& b) const {
     return result;
 }
 
-// 計算多項式在某個值的結果
 float Polynomial::Evaluate(float x) const {
     float result = 0;
     for (Term* current = head->link; current != head; current = current->link) {
@@ -184,7 +175,6 @@ float Polynomial::Evaluate(float x) const {
     return result;
 }
 
-// 重載運算符<<，用於輸出多項式
 ostream& operator<<(ostream& os, const Polynomial& poly) {
     Term* current = poly.head->link;
     while (current != poly.head) {
@@ -195,7 +185,6 @@ ostream& operator<<(ostream& os, const Polynomial& poly) {
     return os;
 }
 
-// 重載運算符>>，用於輸入多項式
 istream& operator>>(istream& is, Polynomial& poly) {
     int n;
     cout << "輸入項數: ";
@@ -218,16 +207,32 @@ int main() {
     cout << "輸入第二個多項式:\n";
     cin >> p2;
     
+    // 測量加法運算時間
+    auto start = chrono::high_resolution_clock::now();
     p3 = p1 + p2;
-    cout << "和: " << p3 << endl;
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double> duration = end - start;
+    cout << "加法結果: " << p3 << endl;
+    cout << "加法運算時間: " << duration.count() << " 秒" << endl;
     
+    // 測量乘法運算時間
+    start = chrono::high_resolution_clock::now();
     p3 = p1 * p2;
-    cout << "積: " << p3 << endl;
+    end = chrono::high_resolution_clock::now();
+    duration = end - start;
+    cout << "乘法結果: " << p3 << endl;
+    cout << "乘法運算時間: " << duration.count() << " 秒" << endl;
 
+    // 測量多項式求值時間
     float x;
     cout << "輸入x的值來計算多項式p1在x的值: ";
     cin >> x;
-    cout << "p1(" << x << ") = " << p1.Evaluate(x) << endl;
+    start = chrono::high_resolution_clock::now();
+    float result = p1.Evaluate(x);
+    end = chrono::high_resolution_clock::now();
+    duration = end - start;
+    cout << "p1(" << x << ") = " << result << endl;
+    cout << "求值運算時間: " << duration.count() << " 秒" << endl;
 
     return 0;
 }
